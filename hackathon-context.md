@@ -256,13 +256,15 @@ The knowledge base holds a lot of sensitive data, so leak prevention is part of 
 
 **For the chatbot (Person 1):** prompt = system rules + `buildUserContext(...)` + `toPromptContext(await retrieve(tenantId, question))`. Optionally run `scanSensitive()` on the answer before sending.
 
-**Tests:** tenant A never sees tenant B, internal docs never returned, prompt injection can't escape tags, secrets masked, user A never sees user B. 21 pass; 2 live-DB tests run only with Supabase keys.
+**Tests:** tenant A never sees tenant B, internal docs never returned, prompt injection can't escape tags, secrets masked, user A never sees user B. 62 offline tests pass (`npm test`); 2 live-DB isolation tests pass on the real Supabase (`npm run test:live`).
 
 **How to run** (in `RAG/`): copy `.env.example` → `.env.local` and fill it; `npm install`; `npm test`; `npm run ingest` (or `npm run ingest:watch`). The GitHub Action `.github/workflows/rag-ingest.yml` runs tests, then ingest, on every push to `main` that changes docs or `RAG/lib/rag`.
+
+**Demo knowledge base:** `RAG/docs/kb/lumora/` — 14 docs for the Lumora demo site (`demo-site/`), 101 chunks. 10 public (getting started, lessons & schedule, plans & pricing, billing & subscription, tutors, account & privacy, technical help, subjects & resources, site navigation, contact support), 3 internal (support playbook, retention offers with discount codes, known issues incl. Apple Pay bug), 1 restricted (fake secrets, shows the scanner). Sections carry `- URL:` and `- Tools:` lines (e.g. `reschedule_lesson`, `pause_subscription`, `cancel_subscription`, `request_refund`, `change_tutor`, `reset_password`) so the chatbot knows which card/action fits. `npm run eval` scores retrieval on 25 real questions and 5 leak attempts.
+
+**Live results (Supabase + Gemini, Lumora):** 103 chunks indexed, top-3 accuracy 25/25, leaks 0/5, both live isolation tests pass. Similarity cutoff set to **0.60** from measurements: pure off-topic questions score 0.52–0.57, real ones 0.66+. The cutoff only drops junk; borderline questions ("piano lessons?") still return related chunks, and the chatbot must decide relevance by reading them (`GROUNDING_RULES`). Gemini free tier = 100 embedding requests/min: ingest waits and retries; chat queries retry once and fail fast.
 
 **Still to do**
 - Add GitHub secrets: `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Settings → Secrets → Actions).
 - In Supabase: `drop table doc_chunks cascade;` then run `RAG/supabase/rag.sql`.
-- Write sample docs for 2 demo tenants.
-- Tune the similarity cutoff (0.45) on real questions.
 

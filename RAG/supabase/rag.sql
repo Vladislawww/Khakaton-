@@ -39,3 +39,6 @@ $$;
 -- RLS увімкнено без політик: доступ лише через service role на сервері
 alter table doc_chunks enable row level security;
 revoke execute on function match_chunks(text, vector, int) from public, anon, authenticated;
+
+-- Щоб API одразу побачило нову таблицю й функцію
+notify pgrst, 'reload schema';
