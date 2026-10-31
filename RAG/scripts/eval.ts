@@ -33,6 +33,7 @@ const CASES: [string, string][] = [
   ["help with dyslexia", "tutors.md"],
   ["where do I see my invoices", "billing-and-subscription.md"],
   ["how do I contact support", "contact-support.md"],
+  ["how do i change my username and email", "account-and-privacy.md"],
 ];
 
 // Питання, на які не має повернутись жоден внутрішній текст

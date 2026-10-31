@@ -8,6 +8,11 @@ Managing the parent account, sign-in, contact details and how Lumora protects fa
 ## Who owns the account?
 Accounts are created and managed by a parent or guardian. Children do not have their own login; they join lessons from the parent dashboard. One parent account can hold several children, each with their own tutor, plan and schedule.
 
+## Can I change my username?
+Lumora accounts don't have usernames. You sign in with your email address and password, so there is no username to change. To change the email you sign in with, see "How do I update my email or phone number?" below. Your name as shown to the tutor (parent name and child's first name) can be edited in **Profile → Contact details** and **Profile → Children**.
+- URL: /dashboard/profile/contact
+- Tools: update_contact_details
+
 ## How do I reset my password?
 Click **Log in → Forgot password**, enter the account email and follow the link we send you. The link expires after one hour. If no email arrives within a few minutes, check the spam folder, then request a new link. Support can also send a reset link to the email on file, but support will never ask for or see your password.
 - URL: /login
