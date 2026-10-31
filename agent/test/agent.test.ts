@@ -225,6 +225,19 @@ test("tool results carry local times, and a runaway tool loop stops", async () =
   assert.match(v.messages.at(-1)!.text, /couldn't finish/);
 });
 
+test("a failed model call leaves the conversation clean for a resend", async () => {
+  let fail = true;
+  const agent = makeAgent(async () => {
+    if (fail) throw new Error("rate limited");
+    return say("Hello again!");
+  });
+  const v = await agent.sendMessage({ accountId: "acc_1001", message: "hi" }).catch(() => null);
+  assert.equal(v, null);
+  fail = false;
+  const ok = await agent.sendMessage({ accountId: "acc_1001", message: "hi" });
+  assert.equal(ok.messages.length, 2);
+});
+
 test("if the knowledge base is down, the model is told not to guess", async () => {
   const m = scripted([say("I can't check that right now.")]);
   const agent = makeAgent(m.model, async () => {

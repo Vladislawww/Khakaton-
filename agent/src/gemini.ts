@@ -18,31 +18,37 @@ export type ModelRequest = { system: string; contents: Content[]; tools: Functio
 /** One model turn. Return the model's content exactly as received, so thought signatures round-trip. */
 export type Model = (req: ModelRequest) => Promise<Content>;
 
-const RETRIES = 3;
+const RETRIES = 2;
+const MAX_WAIT = 20_000; // keep a chat reply under a minute even when throttled
 
-/** Status codes where another model may still work: retired model, quota, overload. */
-const FALL_THROUGH = new Set([404, 429, 503]);
+/** Thrown when Gemini keeps rate-limiting us (free tier: a few requests per minute). */
+export class ModelBusyError extends Error {}
 
-export function geminiModel(opts: { apiKey: string; model: string; fallbacks?: string[]; temperature?: number }): Model {
-  const one = geminiModelOnce(opts);
-  const rest = (opts.fallbacks ?? []).filter((m) => m !== opts.model);
-  if (!rest.length) return one;
-  const chain = [one, ...rest.map((model) => geminiModelOnce({ ...opts, model }))];
+/**
+ * Tries each model in order; on quota (429), overload (5xx) or a retired model (404) it moves straight to the next.
+ * Free-tier limits are per model, so a chain of Flash / Flash-Lite models keeps a demo responsive.
+ */
+export function geminiChain(opts: { apiKey: string; models: string[]; temperature?: number }): Model {
+  const clients = opts.models.map((model) => ({ model, call: geminiModel({ ...opts, model, retries: 0 }) }));
   return async (req) => {
-    for (let i = 0; ; i++) {
+    let last: unknown;
+    for (const { model, call } of clients) {
       try {
-        return await chain[i](req);
+        return await call(req);
       } catch (e) {
-        const status = Number(String(e).match(/Gemini API (\d{3})/)?.[1]);
-        if (i === chain.length - 1 || !FALL_THROUGH.has(status)) throw e;
-        console.warn(`Gemini ${status} on ${i === 0 ? opts.model : rest[i - 1]}, trying ${rest[i]}`);
+        last = e;
+        const msg = String(e);
+        if (!(e instanceof ModelBusyError) && !/Gemini API (404|5\d\d)/.test(msg)) throw e;
+        console.warn(`Gemini ${model} unavailable, trying next: ${msg.slice(0, 120)}`);
       }
     }
+    throw last instanceof ModelBusyError ? last : new ModelBusyError(String(last));
   };
 }
 
-function geminiModelOnce(opts: { apiKey: string; model: string; temperature?: number }): Model {
+export function geminiModel(opts: { apiKey: string; model: string; temperature?: number; retries?: number }): Model {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${opts.model}:generateContent`;
+  const retries = opts.retries ?? RETRIES;
   return async ({ system, contents, tools }) => {
     const body = JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
@@ -57,10 +63,13 @@ function geminiModelOnce(opts: { apiKey: string; model: string; temperature?: nu
         headers: { "Content-Type": "application/json", "x-goog-api-key": opts.apiKey },
         body,
       });
-      if ((res.status === 429 || res.status >= 500) && attempt < RETRIES) {
-        await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+      if ((res.status === 429 || res.status >= 500) && attempt < retries) {
+        // Gemini puts the pause in the body: "retryDelay": "17s"
+        const hinted = Number((await res.clone().text()).match(/"retryDelay":\s*"(\d+(?:\.\d+)?)s"/)?.[1]);
+        await new Promise((r) => setTimeout(r, Math.min(MAX_WAIT, hinted ? hinted * 1000 + 500 : 1500 * 2 ** attempt)));
         continue;
       }
+      if (res.status === 429) throw new ModelBusyError(`Gemini rate limit: ${(await res.text()).slice(0, 300)}`);
       if (!res.ok) throw new Error(`Gemini API ${res.status}: ${(await res.text()).slice(0, 500)}`);
       const json = (await res.json()) as { candidates?: { content?: Content; finishReason?: string }[] };
       const content = json.candidates?.[0]?.content;

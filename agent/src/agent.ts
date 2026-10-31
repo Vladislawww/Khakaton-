@@ -175,8 +175,7 @@ export function createAgent(deps: Deps) {
       now_local: formatLocal(now().toISOString(), conv.timeZone),
       time_zone: conv.timeZone,
       verified: a?.verified ?? false,
-      reply_language: "same as the parent's latest message",
-      preferred_language_for_proactive_messages: a?.preferred_language ?? "en",
+      preferred_language: a?.preferred_language ?? "en",
       children: a?.children ?? [],
     };
     const { hits, failed } = await safeRetrieve(message);
@@ -455,11 +454,19 @@ export function createAgent(deps: Deps) {
     }
 
     return withLock(conv, async () => {
-      conv.transcript.push({ role: "user", text: message, at: now().toISOString() });
-      stripOldContext(conv);
-      const ctx = await turnContext(conv, message);
-      await step(conv, [{ text: ctx.text }, { text: `Parent's message: ${message}` }], undefined, ctx.hits);
-      return view(conv);
+      const before = { contents: conv.contents.length, transcript: conv.transcript.length };
+      try {
+        conv.transcript.push({ role: "user", text: message, at: now().toISOString() });
+        stripOldContext(conv);
+        const ctx = await turnContext(conv, message);
+        await step(conv, [{ text: ctx.text }, { text: `Parent's message: ${message}` }], undefined, ctx.hits);
+        return view(conv);
+      } catch (e) {
+        // Roll back a half-finished turn (e.g. the model was rate-limited) so the parent can simply resend.
+        conv.contents.length = before.contents;
+        conv.transcript.length = before.transcript;
+        throw e;
+      }
     });
   }
 
