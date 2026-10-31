@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log In | Lumora Learning</title>
+  <meta name="description" content="Parent sign-in for the fictional Lumora Learning demo.">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="login">
+  <div data-site-header></div>
+
+  <main>
+    <section class="hero" data-section="login">
+      <div class="container">
+        <div class="card auth-card">
+          <span class="eyebrow">Parent account</span>
+          <h1>Welcome back</h1>
+          <p class="muted">Sign in to see your child’s lessons, plan and progress.</p>
+          <form id="login-form" novalidate>
+            <div class="field"><label for="li-email">Email</label><input id="li-email" type="email" autocomplete="username" required></div>
+            <div class="field"><label for="li-password">Password</label><input id="li-password" type="password" autocomplete="current-password" required></div>
+            <p class="form-error" role="alert"></p>
+            <button class="btn btn--primary">Log in</button>
+          </form>
+          <div class="demo-accounts">
+            <p><strong>Demo parents</strong> (password in the team README):</p>
+            <div class="chips">
+              <button class="chip" data-demo-email="anna.kovalenko@example.com">Anna: happy path</button>
+              <button class="chip" data-demo-email="ben.carter@example.com">Ben: wants to cancel</button>
+              <button class="chip" data-demo-email="chloe.nguyen@example.com">Chloe: payment failed</button>
+              <button class="chip" data-demo-email="david.okafor@example.com">David: paused, 2 kids</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    (function () {
+      const db = window.lumora.db;
+      const form = document.getElementById('login-form');
+      const err = form.querySelector('.form-error');
+      if (!db) {
+        err.textContent = 'Sign-in is not configured on this copy of the demo (js/config.js is empty).';
+        form.querySelector('button').disabled = true;
+        return;
+      }
+      db.auth.getSession().then(({ data }) => { if (data.session) location.replace('account.html'); });
+      document.querySelectorAll('[data-demo-email]').forEach((b) =>
+        b.addEventListener('click', () => {
+          document.getElementById('li-email').value = b.dataset.demoEmail;
+          document.getElementById('li-password').focus();
+        })
+      );
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        err.textContent = '';
+        const btn = form.querySelector('button');
+        btn.disabled = true;
+        const { error } = await db.auth.signInWithPassword({
+          email: document.getElementById('li-email').value.trim(),
+          password: document.getElementById('li-password').value,
+        });
+        btn.disabled = false;
+        if (error) { err.textContent = 'That email and password don’t match an account.'; return; }
+        location.href = 'account.html';
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -4,6 +4,15 @@
 
   const page = document.body.dataset.page || '';
 
+  /* ---------- Supabase client (optional: the site still works as a static mock without it) ---------- */
+
+  const cfg = window.LUMORA_CONFIG || {};
+  const db =
+    cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase
+      ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey)
+      : null;
+  window.lumora = { db };
+
   /* ---------- Icons and illustrations ---------- */
 
   const icon = {
@@ -179,6 +188,7 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.remove('is-visible'), 2800);
   };
+  window.lumora.toast = toast;
 
   const openBooking = (grade, subject) => {
     modal.classList.remove('is-done');
@@ -187,8 +197,23 @@
     modal.showModal();
   };
 
-  modal.querySelector('form').addEventListener('submit', (e) => {
+  modal.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = modal.querySelector('button[value=ok]');
+    const note = modal.querySelector('.modal-success p');
+    if (db) {
+      btn.disabled = true;
+      const { error } = await db.from('leads').insert({
+        grade: modal.querySelector('#bk-grade').value,
+        subject: modal.querySelector('#bk-subject').value,
+        email: modal.querySelector('#bk-email').value.trim() || null,
+        source_page: page,
+      });
+      btn.disabled = false;
+      note.textContent = error
+        ? 'We could not save your request right now. Please try again in a minute.'
+        : 'Your request is saved. In the real product, a coordinator would reach out within a day.';
+    }
     modal.classList.add('is-done');
   });
 
@@ -201,11 +226,29 @@
     }
     if (e.target.closest('[data-close]')) { modal.close(); return; }
     if (e.target === modal) { modal.close(); return; }
-    if (e.target.closest('[data-login]')) { toast('Sign-in is not part of this demo.'); return; }
+    if (e.target.closest('[data-login]')) {
+      if (db) window.location.href = 'login.html';
+      else toast('Sign-in is not set up on this copy of the demo.');
+      return;
+    }
     if (e.target.closest('[data-toast]')) { e.preventDefault(); toast(e.target.closest('[data-toast]').dataset.toast); }
   });
 
   /* ---------- Header behaviour ---------- */
+
+  // Signed-in parents see "My account" instead of "Log in".
+  if (db) {
+    db.auth.getSession().then(({ data }) => {
+      if (!data.session) return;
+      document.querySelectorAll('[data-login]').forEach((b) => {
+        const a = document.createElement('a');
+        a.className = b.className;
+        a.href = 'account.html';
+        a.textContent = 'My account';
+        b.replaceWith(a);
+      });
+    });
+  }
 
   const siteHeader = document.querySelector('.site-header');
   const onScroll = () => siteHeader && siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);

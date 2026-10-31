@@ -32,7 +32,26 @@ npx serve demo-site
 - `js/site.js`: injects the shared header and footer, plus menus, carousel, booking modal, filters and illustrations.
 - Every section has a `data-section` name, so the agent or tests can target it.
 
+## Accounts and data (Supabase)
+
+- Project: `lumora-demo` (ref `ygriuepyedzfupejluwb`, Frankfurt, free tier). Its URL and public anon key are in `js/config.js`; that key is safe in the browser because every table uses row level security.
+- Schema: `supabase/migrations/001_schema.sql`. Test data: `supabase/seed.sql`. Lesson dates are relative to the time you seed.
+- Test parents (they all share the password stored in `seed.sql`):
+
+| Email | Scenario |
+|---|---|
+| anna.kovalenko@example.com | Happy path: active plan, upcoming lessons to reschedule |
+| ben.carter@example.com | Retention: wants to cancel, 3 lessons left |
+| chloe.nguyen@example.com | Proactive: card declined, subscription past due |
+| david.okafor@example.com | Two children, subscription paused |
+
+- Toolkit for the agent: call these with the parent's own session via `supabase.rpc(...)`:
+  `pause_subscription(weeks)`, `resume_subscription()`, `request_cancellation(reason)`, `accept_retention_offer(pct)`,
+  `reschedule_lesson(lesson_id, new_start)`, `cancel_lesson(lesson_id)`, `retry_payment()`.
+  Each one checks ownership and writes to `action_log`.
+- Booking requests from the "Book a free lesson" form land in `leads`.
+
 ## Demo stubs
 
-"Book a free lesson" opens a modal that sends nothing. "Log in", the video, tutor applications, article pages and worksheet downloads show a toast instead.
+The video, tutor applications, article pages and worksheet downloads show a toast instead of opening anything.
 "Chat with support" on the help center is where the AI support agent can plug in.

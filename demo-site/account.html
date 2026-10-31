@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Account | Lumora Learning</title>
+  <meta name="description" content="Parent dashboard for the fictional Lumora Learning demo.">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="account">
+  <div data-site-header></div>
+
+  <main>
+    <section class="section" data-section="dashboard">
+      <div class="container">
+        <div class="dash-head">
+          <div>
+            <span class="eyebrow">My account</span>
+            <h1 id="greeting" style="font-size:clamp(32px,4.4vw,52px)">Loading…</h1>
+          </div>
+          <button class="btn btn--ghost btn--sm" id="sign-out">Sign out</button>
+        </div>
+        <div id="alert-slot"></div>
+
+        <div class="dash-grid">
+          <article class="card dash-card" data-section="subscription">
+            <h2 class="dash-title">Your plan</h2>
+            <div id="subscription">…</div>
+          </article>
+
+          <article class="card dash-card" data-section="schedule">
+            <h2 class="dash-title">Upcoming lessons</h2>
+            <ul class="rows" id="lessons"><li class="muted">…</li></ul>
+          </article>
+
+          <article class="card dash-card" data-section="children">
+            <h2 class="dash-title">Children</h2>
+            <ul class="rows" id="children"><li class="muted">…</li></ul>
+          </article>
+
+          <article class="card dash-card" data-section="profile">
+            <h2 class="dash-title">Profile</h2>
+            <form id="profile-form" class="stack">
+              <div class="field"><label for="pf-name">Name</label><input id="pf-name" autocomplete="off"></div>
+              <div class="field"><label for="pf-email">Email</label><input id="pf-email" disabled></div>
+              <div class="field"><label for="pf-phone">Phone</label><input id="pf-phone" autocomplete="off"></div>
+              <div class="field"><label for="pf-tz">Time zone</label>
+                <select id="pf-tz"><option>America/New_York</option><option>America/Chicago</option><option>America/Denver</option><option>America/Los_Angeles</option><option>Europe/London</option><option>Europe/Kyiv</option></select></div>
+              <button class="btn btn--dark btn--sm">Save profile</button>
+            </form>
+          </article>
+
+          <article class="card dash-card" data-section="payments">
+            <h2 class="dash-title">Payments</h2>
+            <ul class="rows" id="payments"><li class="muted">…</li></ul>
+          </article>
+
+          <article class="card dash-card" data-section="activity">
+            <h2 class="dash-title">Recent account activity</h2>
+            <ul class="rows" id="activity"><li class="muted">…</li></ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="modal" id="action-modal" aria-labelledby="action-title">
+    <div class="modal-body">
+      <button class="modal-close" aria-label="Close" data-action-close>×</button>
+      <div id="action-content"></div>
+    </div>
+  </dialog>
+
+  <div data-site-footer></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/site.js"></script>
+  <script src="js/account.js"></script>
+</body>
+</html>

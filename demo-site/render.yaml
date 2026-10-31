@@ -1,0 +1,21 @@
+# Render Blueprint for the Lumora demo site (static, no build step).
+# Render reads render.yaml from the repo root by default; point the Blueprint at demo-site/render.yaml.
+services:
+  - type: web
+    name: lumora-demo
+    runtime: static
+    rootDir: demo-site
+    buildCommand: ""
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      - type: rewrite
+        source: /account
+        destination: /account.html
