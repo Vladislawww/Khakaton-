@@ -1,0 +1,22 @@
+{
+  "name": "rag",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "ingest": "tsx scripts/ingest.ts",
+    "ingest:watch": "tsx scripts/ingest.ts --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.5",
+    "tsx": "4.19.1",
+    "typescript": "5.6.3",
+    "vitest": "2.1.9"
+  }
+}

@@ -239,7 +239,7 @@ The knowledge base holds a lot of sensitive data, so leak prevention is part of 
 ## 12. RAG + user context: current status (code in `RAG/`)
 
 **Knowledge base (RAG)**
-- Docs live in the GitHub repo: `docs/kb/<tenant>/*.md`, one folder per business. Pushing to `main` runs a GitHub Action that updates Supabase. No upload API.
+- Docs live in the GitHub repo: `RAG/docs/kb/<tenant>/*.md`, one folder per business. Pushing to `main` runs a GitHub Action that updates Supabase. No upload API.
 - Each doc starts with `visibility: public | internal | restricted` (in a `---` header). No label = `internal`. Only `public` reaches customers.
   - Public: FAQ, prices/plans, how-to and navigation, refund/cancel policy, contacts and hours.
   - Internal: support scripts, escalation rules, **retention discount limits**, known bugs.
@@ -258,8 +258,10 @@ The knowledge base holds a lot of sensitive data, so leak prevention is part of 
 
 **Tests:** tenant A never sees tenant B, internal docs never returned, prompt injection can't escape tags, secrets masked, user A never sees user B. 21 pass; 2 live-DB tests run only with Supabase keys.
 
+**How to run** (in `RAG/`): copy `.env.example` → `.env.local` and fill it; `npm install`; `npm test`; `npm run ingest` (or `npm run ingest:watch`). The GitHub Action `.github/workflows/rag-ingest.yml` runs tests, then ingest, on every push to `main` that changes docs or `RAG/lib/rag`.
+
 **Still to do**
-- Move `RAG/` into the main app repo: add `package.json` scripts (`ingest`, `ingest:watch`), `@/` path alias, move `ingest.workflow.yml` to `.github/workflows/`, add `.env.example`.
+- Add GitHub secrets: `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Settings → Secrets → Actions).
 - In Supabase: `drop table doc_chunks cascade;` then run `RAG/supabase/rag.sql`.
 - Write sample docs for 2 demo tenants.
 - Tune the similarity cutoff (0.45) on real questions.

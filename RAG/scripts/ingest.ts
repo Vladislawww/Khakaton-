@@ -2,6 +2,7 @@
  * npm run ingest         — одноразова синхронізація docs/kb/<tenant>/ → Supabase
  * npm run ingest:watch   — стежить за папкою і оновлює RAG при кожній зміні файлу
  */
+import "./env";
 import { watch } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
