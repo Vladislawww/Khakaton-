@@ -106,14 +106,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     process.loadEnvFile(".env.local");
   } catch {}
   const missing = ["GEMINI_API_KEY", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"].filter((name) => !process.env[name]);
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  // gemini-2.5/2.0 are closed to new API keys; 3.5-flash-lite works on the free tier with tool calls.
+  const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS ?? "gemini-3.8-flash").split(",").map((m) => m.trim()).filter(Boolean);
   const supportApiUrl = process.env.SUPPORT_API_URL || "https://lumora-api-lm0d.onrender.com";
   const tenantId = process.env.TENANT_ID || "lumora";
 
   const agent = missing.length
     ? unconfiguredAgent(missing)
     : createAgent({
-        model: geminiModel({ apiKey: process.env.GEMINI_API_KEY!, model }),
+        model: geminiModel({ apiKey: process.env.GEMINI_API_KEY!, model, fallbacks }),
         api: supportApi(supportApiUrl),
         retrieve: (tenant, q) => retrieve(tenant, q),
         tenantId,
@@ -124,6 +126,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   createHttpServer(agent, {
     allowedOrigin: process.env.ALLOWED_ORIGIN,
     supervisorToken: process.env.SUPERVISOR_TOKEN,
-    info: { configured: !missing.length, missing, model, tenant: tenantId, support_api: supportApiUrl },
+    info: { configured: !missing.length, missing, model, fallbacks, tenant: tenantId, support_api: supportApiUrl },
   }).listen(port, () => console.log(`Lumora support agent listening on :${port} (model ${model})`));
 }

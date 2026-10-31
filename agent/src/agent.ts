@@ -175,7 +175,8 @@ export function createAgent(deps: Deps) {
       now_local: formatLocal(now().toISOString(), conv.timeZone),
       time_zone: conv.timeZone,
       verified: a?.verified ?? false,
-      preferred_language: a?.preferred_language ?? "en",
+      reply_language: "same as the parent's latest message",
+      preferred_language_for_proactive_messages: a?.preferred_language ?? "en",
       children: a?.children ?? [],
     };
     const { hits, failed } = await safeRetrieve(message);
