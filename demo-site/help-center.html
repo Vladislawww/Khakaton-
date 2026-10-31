@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help Center | Lumora Learning</title>
+  <meta name="description" content="Answers about lessons, scheduling, billing and accounts at Lumora Learning. Fictional demo site.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="help">
+  <div data-site-header></div>
+
+  <main>
+    <section class="hero" data-section="hero">
+      <div class="container">
+        <span class="eyebrow">Help center</span>
+        <h1>How can we help?</h1>
+        <p class="lead">Search our answers, or reach the support team any time.</p>
+        <form class="hero-search" id="help-form" role="search">
+          <label class="sr-only" for="help-search">Search help articles</label>
+          <input id="help-search" type="search" placeholder="Try “reschedule” or “cancel”" autocomplete="off">
+          <button class="btn btn--primary">Search</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="section section--white" data-section="top-articles">
+      <div class="container">
+        <div class="section-head reveal"><h2>Most-read articles</h2></div>
+        <div class="grid grid-4">
+          <a class="card card--link reveal" href="#faq" data-help-topic="reschedule"><div class="icon-badge">🗓</div><h3>Reschedule a lesson</h3><p class="muted">Move a lesson to another time up to 4 hours before it starts.</p></a>
+          <a class="card card--link reveal" href="#faq" data-help-topic="subscription"><div class="icon-badge icon-badge--coral">💳</div><h3>Manage your plan</h3><p class="muted">Upgrade, pause or cancel your subscription.</p></a>
+          <a class="card card--link reveal" href="#faq" data-help-topic="join"><div class="icon-badge icon-badge--sun">🎧</div><h3>Join a lesson</h3><p class="muted">Get your child into the lesson room in three clicks.</p></a>
+          <a class="card card--link reveal" href="#faq" data-help-topic="tutor"><div class="icon-badge">🔁</div><h3>Change tutor</h3><p class="muted">Request a new tutor match at no cost.</p></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--sand" data-section="faq" id="faq">
+      <div class="container" data-help>
+        <div class="section-head"><h2>Frequently asked questions</h2></div>
+        <div class="faq-layout">
+          <div class="faq-cats" role="group" aria-label="Filter by topic">
+            <button class="is-active" data-cat="all" aria-pressed="true">All topics</button>
+            <button data-cat="start" aria-pressed="false">Getting started</button>
+            <button data-cat="lessons" aria-pressed="false">Lessons &amp; schedule</button>
+            <button data-cat="billing" aria-pressed="false">Billing &amp; plans</button>
+            <button data-cat="account" aria-pressed="false">Account &amp; privacy</button>
+            <button data-cat="tech" aria-pressed="false">Technical help</button>
+          </div>
+          <div>
+            <div class="faq-group" data-group="start">
+              <h3>Getting started</h3>
+              <div class="faq">
+                <details><summary>How do I get started with Lumora?</summary><div class="answer"><p>Book a free lesson, complete the 20-minute skills check, and we’ll match a tutor within 48 hours.</p></div></details>
+                <details><summary>What happens after the free lesson?</summary><div class="answer"><p>Your tutor shares a recommended plan. Choose a subscription to keep the same tutor and schedule.</p></div></details>
+                <details><summary>Is the curriculum aligned with school standards?</summary><div class="answer"><p>Yes, with Common Core and individual state standards.</p></div></details>
+              </div>
+            </div>
+            <div class="faq-group" data-group="lessons">
+              <h3>Lessons &amp; schedule</h3>
+              <div class="faq">
+                <details><summary>How do I reschedule a lesson?</summary><div class="answer"><p>Open <strong>Schedule</strong> in your dashboard, pick the lesson and choose <strong>Reschedule</strong>. Changes are free up to 4 hours before the start time.</p></div></details>
+                <details><summary>What if my child misses a lesson?</summary><div class="answer"><p>Lessons missed without 4 hours’ notice are counted as used. Two late cancellations per plan period are forgiven automatically.</p></div></details>
+                <details><summary>How do I change tutor?</summary><div class="answer"><p>Go to <strong>Profile → Tutor</strong> and select <strong>Request a new tutor</strong>. Switching is always free.</p></div></details>
+                <details><summary>How do I join a lesson?</summary><div class="answer"><p>Five minutes before start time, a <strong>Join lesson</strong> button appears in the dashboard. Use Chrome, Edge or Safari with camera and microphone allowed.</p></div></details>
+              </div>
+            </div>
+            <div class="faq-group" data-group="billing">
+              <h3>Billing &amp; plans</h3>
+              <div class="faq">
+                <details><summary>How do I cancel my subscription?</summary><div class="answer"><p>Go to <strong>Subscription → Manage plan → Cancel</strong>. Cancellation takes effect at the end of the current billing month, and unused lessons remain available.</p></div></details>
+                <details><summary>Can I pause my subscription?</summary><div class="answer"><p>Yes, for up to 3 months at a time, from <strong>Subscription → Pause</strong>.</p></div></details>
+                <details><summary>How do I upgrade or change my plan?</summary><div class="answer"><p>Choose <strong>Subscription → Change plan</strong>. The new price applies from the next billing date.</p></div></details>
+                <details><summary>How do refunds work?</summary><div class="answer"><p>Unused lessons can be refunded within 30 days of purchase. Contact support to start a refund.</p></div></details>
+              </div>
+            </div>
+            <div class="faq-group" data-group="account">
+              <h3>Account &amp; privacy</h3>
+              <div class="faq">
+                <details><summary>How do I reset my password?</summary><div class="answer"><p>Click <strong>Log in → Forgot password</strong> and follow the email link. Links expire after one hour.</p></div></details>
+                <details><summary>How do I update my email or phone number?</summary><div class="answer"><p>Edit them in <strong>Profile → Contact details</strong>.</p></div></details>
+                <details><summary>How is my child’s data protected?</summary><div class="answer"><p>See our <a href="privacy.html">privacy policy</a>. We never sell personal data.</p></div></details>
+              </div>
+            </div>
+            <div class="faq-group" data-group="tech">
+              <h3>Technical help</h3>
+              <div class="faq">
+                <details><summary>The lesson room won’t load</summary><div class="answer"><p>Refresh the page, then check that camera and microphone access are allowed. If it still fails, try another browser or contact support.</p></div></details>
+                <details><summary>My child can’t hear the tutor</summary><div class="answer"><p>Check the headphones are selected as the audio output in the lesson room settings (gear icon).</p></div></details>
+                <details><summary>Which devices are supported?</summary><div class="answer"><p>Windows or Mac laptops, Chromebooks and iPads from the last five years.</p></div></details>
+              </div>
+            </div>
+            <div class="faq-empty"><strong>No answers match your search.</strong><p class="muted">Try another word, or contact support below.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-section="contact">
+      <div class="container">
+        <div class="banner banner--compact reveal" id="contact">
+          <div><h2>Still need help?</h2><p>Our support team replies within minutes, seven days a week.</p></div>
+          <div class="btn-row"><button class="btn btn--primary" data-toast="Live chat will be the AI support agent in the demo.">Chat with support</button><a class="btn btn--light" href="mailto:hello@lumora.example">Email us</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--white" data-section="related">
+      <div class="container">
+        <div class="section-head reveal"><h2>From the blog</h2></div>
+        <div class="grid grid-3">
+          <a class="card card--link post reveal" href="blog.html"><div class="art art--sun" data-art="numbers"></div><div class="post-body"><span class="tag">Math</span><h3>Five kitchen games that teach fractions</h3></div></a>
+          <a class="card card--link post reveal" href="blog.html"><div class="art art--coral" data-art="book"></div><div class="post-body"><span class="tag tag--coral">Reading</span><h3>Picking books for reluctant readers</h3></div></a>
+          <a class="card card--link post reveal" href="blog.html"><div class="art art--sky" data-art="chat"></div><div class="post-body"><span class="tag tag--sun">Parenting</span><h3>How to talk to your child about grades</h3></div></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+  <script src="js/site.js"></script>
+</body>
+</html>
