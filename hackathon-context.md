@@ -260,9 +260,10 @@ The knowledge base holds a lot of sensitive data, so leak prevention is part of 
 
 **How to run** (in `RAG/`): copy `.env.example` → `.env.local` and fill it; `npm install`; `npm test`; `npm run ingest` (or `npm run ingest:watch`). The GitHub Action `.github/workflows/rag-ingest.yml` runs tests, then ingest, on every push to `main` that changes docs or `RAG/lib/rag`.
 
+**Demo knowledge base:** `RAG/docs/kb/lumora/` — 14 docs for the Lumora demo site (`demo-site/`), 101 chunks. 10 public (getting started, lessons & schedule, plans & pricing, billing & subscription, tutors, account & privacy, technical help, subjects & resources, site navigation, contact support), 3 internal (support playbook, retention offers with discount codes, known issues incl. Apple Pay bug), 1 restricted (fake secrets, shows the scanner). Sections carry `- URL:` and `- Tools:` lines (e.g. `reschedule_lesson`, `pause_subscription`, `cancel_subscription`, `request_refund`, `change_tutor`, `reset_password`) so the chatbot knows which card/action fits. `npm run eval` scores retrieval on 24 real questions and 5 leak attempts.
+
 **Still to do**
 - Add GitHub secrets: `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Settings → Secrets → Actions).
 - In Supabase: `drop table doc_chunks cascade;` then run `RAG/supabase/rag.sql`.
-- Write sample docs for 2 demo tenants.
 - Tune the similarity cutoff (0.45) on real questions.
 

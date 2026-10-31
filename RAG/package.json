@@ -2,13 +2,16 @@
   "name": "rag",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "ingest": "tsx scripts/ingest.ts",
     "ingest:watch": "tsx scripts/ingest.ts --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "eval": "tsx scripts/eval.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.45.4"
