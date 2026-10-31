@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { db } from "./db";
 import { embedQuery } from "./embed";
 import { assertTenantId } from "./tenant";
 
@@ -18,10 +18,7 @@ export type Hit = {
  */
 export async function retrieve(tenantId: string, query: string, k = 3, minSimilarity = 0.45): Promise<Hit[]> {
   assertTenantId(tenantId);
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-    auth: { persistSession: false },
-  });
-  const { data, error } = await supabase.rpc("match_chunks", {
+  const { data, error } = await db().rpc("match_chunks", {
     p_tenant_id: tenantId,
     query_embedding: await embedQuery(query),
     match_count: k,

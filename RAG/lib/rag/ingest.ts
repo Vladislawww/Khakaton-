@@ -1,7 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { db } from "./db";
 import { chunkDocument, parseFrontmatter } from "./chunk";
 import { EMBED_VERSION, embedMany } from "./embed";
 import { scanSensitive } from "./scan";
@@ -10,12 +10,6 @@ import { assertTenantId, isTenantId } from "./tenant";
 /** Структура: docs/kb/<tenant_id>/<doc>.md */
 export const DOCS_DIR = process.env.DOCS_DIR ?? "docs/kb";
 export const DOC_FILE = /\.(md|txt)$/i;
-
-// Service role: лише на сервері, ніколи не в клієнтському коді.
-const db = () =>
-  createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-    auth: { persistSession: false },
-  });
 
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
 const PAGE = 1000; // ліміт рядків Supabase на один select
