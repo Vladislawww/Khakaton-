@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import type { AddressInfo } from "node:net";
 // @ts-expect-error: the support API is plain JS without type declarations
 import { server as supportServer } from "../../support-api/server.js";
-import { createAgent } from "../src/agent";
+import { createAgent, detectLanguage } from "../src/agent";
 import type { Content, ModelRequest } from "../src/gemini";
 import { TOOLS } from "../src/prompt";
 import { createHttpServer } from "../src/server";
@@ -245,4 +245,12 @@ test("if the knowledge base is down, the model is told not to guess", async () =
   });
   await agent.sendMessage({ accountId: "acc_1001", message: "what does the 6 month plan cost?" });
   assert.match(JSON.stringify(m.requests[0].contents.at(-1)), /knowledge base is unavailable/);
+});
+
+test("reply language comes from the message letters, not the account", () => {
+  assert.equal(detectLanguage("ok thanks"), "English");
+  assert.equal(detectLanguage("Як змінити пошту?"), "Ukrainian");
+  assert.equal(detectLanguage("Вы можете перенести урок?"), "Russian");
+  assert.equal(detectLanguage("👍"), null);
+  assert.equal(detectLanguage("Max 4 клас, як перенести урок?"), "Ukrainian");
 });

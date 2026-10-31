@@ -48,6 +48,18 @@ type Entry = {
   quick_replies?: QuickReply[];
 };
 
+/**
+ * The model alone follows preferred_language over the message ("ok thanks" got a Ukrainian reply),
+ * so we decide the reply language in code from the letters in the message.
+ */
+export function detectLanguage(text: string): string | null {
+  const cyrillic = (text.match(/[\u0400-\u04FF]/g) ?? []).length;
+  const latin = (text.match(/[A-Za-z]/g) ?? []).length;
+  if (cyrillic > latin) return /[ыэъё]/i.test(text) && !/[іїєґ]/i.test(text) ? "Russian" : "Ukrainian";
+  if (latin > cyrillic) return "English";
+  return null;
+}
+
 type Conversation = {
   id: string;
   accountId: string;
@@ -57,6 +69,8 @@ type Conversation = {
   cards: Map<string, Card>;
   busy: boolean;
   updatedAt: number;
+  /** Language of the parent's last message with a clear script; kept for short replies like "ok". */
+  language?: string;
 };
 
 export type Approval = {
@@ -175,7 +189,7 @@ export function createAgent(deps: Deps) {
       now_local: formatLocal(now().toISOString(), conv.timeZone),
       time_zone: conv.timeZone,
       verified: a?.verified ?? false,
-      preferred_language: a?.preferred_language ?? "en",
+      reply_language: (conv.language = detectLanguage(message) ?? conv.language) ?? a?.preferred_language ?? "en",
       children: a?.children ?? [],
     };
     const { hits, failed } = await safeRetrieve(message);
