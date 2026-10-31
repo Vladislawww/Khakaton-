@@ -25,7 +25,7 @@ REST endpoints the support agent calls as tools. All data is fake and lives in m
 | 4 | assign_tutor | `POST /api/accounts/{account_id}/assign_tutor` | write, medium |
 | 5 | cancel_subscription | `POST /api/accounts/{account_id}/subscription/cancel` | write, **high: human approval** |
 
-Supporting endpoints: `POST /api/accounts/{id}/verify`, `GET /api/audit_log?account_id=&tool=&limit=`, `POST /api/admin/reset`, `GET /api/health`.
+Supporting endpoints: `POST /api/accounts/{id}/verify`, `GET /api/tutors?subject=` (id, name, subjects, rating, has_free_slots; for picking a tutor for assign_tutor), `GET /api/audit_log?account_id=&tool=&limit=`, `POST /api/admin/reset`, `GET /api/health`.
 
 ### 1. get_account
 Returns `account_id, parent_name, email, preferred_language, verified, children[{id, name, grade}], subscription{plan, status, price{amount, currency, interval}, next_billing_date}`.

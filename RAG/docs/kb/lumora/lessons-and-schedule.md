@@ -11,7 +11,7 @@ Open the parent dashboard and go to **Schedule**. It lists every upcoming lesson
 - Tools: show_schedule
 
 ## How do I reschedule a lesson?
-Open **Schedule** in the dashboard, pick the lesson and choose **Reschedule**, then pick a new free slot with the same tutor. Rescheduling is free up to 4 hours before the lesson starts. Within 4 hours of the start, the lesson can no longer be moved; it can only be cancelled as a late cancellation (see below).
+Open **Schedule** in the dashboard, pick the lesson and choose **Reschedule**, then pick a new free slot with the same tutor. Rescheduling is free up to 24 hours before the lesson starts, and the new time must also be at least 24 hours away. Within 24 hours of the start, the lesson can no longer be moved; it can only be cancelled (see below).
 
 Tips: evening slots fill fast, so book early. Weekend slots are available.
 - URL: /dashboard/schedule

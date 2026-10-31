@@ -303,6 +303,15 @@ function cancelSubscription({ account_id }, body) {
   };
 }
 
+// Read-only helper so the agent can find a tutor id for assign_tutor.
+function listTutors({ subject }) {
+  if (subject && !['math', 'reading'].includes(subject)) throw new ApiError('INVALID_REQUEST', '"subject" must be math or reading.');
+  const tutors = state.tutors
+    .filter((t) => !subject || t.subjects.includes(subject))
+    .map((t) => ({ id: t.id, name: t.name, subjects: t.subjects, rating: t.rating, has_free_slots: freeSlots(t, 50, { limit: 1 }).length > 0 }));
+  return { count: tutors.length, tutors };
+}
+
 // Mock identity check the agent runs before any write: the caller must know the account email and a child's name.
 function verifyIdentity({ account_id }, body) {
   const email = requireString(body, 'email');
@@ -324,6 +333,7 @@ const routes = [
   { method: 'POST', path: /^\/api\/accounts\/([^/]+)\/assign_tutor$/,           tool: 'assign_tutor',        params: ['account_id'], handler: assignTutor },
   { method: 'POST', path: /^\/api\/accounts\/([^/]+)\/subscription\/cancel$/,   tool: 'cancel_subscription', params: ['account_id'], handler: cancelSubscription },
   { method: 'POST', path: /^\/api\/accounts\/([^/]+)\/verify$/,                 tool: 'verify_identity',     params: ['account_id'], handler: verifyIdentity },
+  { method: 'GET',  path: /^\/api\/tutors$/,                                     tool: 'list_tutors',         params: [],             handler: (_p, _b, q) => listTutors(q) },
 ];
 
 const INDEX = {
@@ -336,6 +346,7 @@ const INDEX = {
     'POST /api/accounts/{account_id}/assign_tutor',
     'POST /api/accounts/{account_id}/subscription/cancel',
     'POST /api/accounts/{account_id}/verify',
+    'GET  /api/tutors?subject=',
     'GET  /api/audit_log?account_id=&tool=&limit=',
     'POST /api/admin/reset',
   ],

@@ -218,6 +218,15 @@ test('audit log records every tool call with timestamp, tool, args, caller, resu
   assert.ok(filtered.every((e) => e.tool === 'get_account'));
 });
 
+test('list_tutors filters by subject and flags the fully booked tutor', async () => {
+  const r = await call('GET', '/api/tutors?subject=math');
+  assert.equal(r.ok, true);
+  assert.ok(r.data.tutors.every((t) => t.subjects.includes('math')));
+  assert.equal(r.data.tutors.find((t) => t.id === 'tut_02').has_free_slots, false);
+  assert.equal(r.data.tutors.find((t) => t.id === 'tut_03').has_free_slots, true);
+  assert.equal(code(await call('GET', '/api/tutors?subject=art')), 'INVALID_REQUEST');
+});
+
 test('unknown route and wrong method use the envelope too', async () => {
   assert.equal(code(await call('GET', '/api/nope')), 'ROUTE_NOT_FOUND');
   assert.equal(code(await call('GET', '/api/lessons/les_3002/reschedule')), 'METHOD_NOT_ALLOWED');
