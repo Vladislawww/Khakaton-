@@ -175,7 +175,6 @@ export function createAgent(deps: Deps) {
       now_local: formatLocal(now().toISOString(), conv.timeZone),
       time_zone: conv.timeZone,
       verified: a?.verified ?? false,
-      preferred_language: a?.preferred_language ?? "en",
       children: a?.children ?? [],
     };
     const { hits, failed } = await safeRetrieve(message);
