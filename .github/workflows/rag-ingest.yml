@@ -1,0 +1,28 @@
+name: Sync RAG knowledge base
+on:
+  push:
+    branches: [main]
+    paths: ["RAG/docs/kb/**", "RAG/lib/rag/**"] # зміна чанкінгу/сканера теж перебудовує базу
+  workflow_dispatch: # ручний запуск кнопкою в GitHub → Actions
+
+defaults:
+  run:
+    working-directory: RAG
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: RAG/package-lock.json
+      - run: npm ci
+      - run: npm test # не оновлюємо базу, якщо тести безпеки впали
+      - run: npm run ingest
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

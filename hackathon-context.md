@@ -1,7 +1,7 @@
 # Team context: SKELAR PolyTech Code Fest (one-day hackathon)
 
 Paste this into your AI assistant as context. It summarizes everything we decided so far.
-**Last update: code reader / bug-fixing branch removed; pivot to outsourced support for small businesses; RAG instead of docs; data-leak protection added.**
+**Last update: RAG system built (`RAG/` folder): per-tenant knowledge base, doc visibility, secret scanner, user personal context. See section 12.**
 
 ---
 
@@ -138,7 +138,7 @@ The knowledge base holds a lot of sensitive data, so leak prevention is part of 
 |---|---|---|---|
 | 1 | **Tenant isolation** | Separate index or mandatory `tenant_id` filter at DB level (Supabase: pgvector + RLS). Filter is added by the backend, not by the LLM, so prompt injection can't bypass it. | Yes |
 | 2 | **Document classification** | Labels `public` / `internal` / `restricted` at indexing time. Only `public` is indexed for the customer-facing agent. | Yes |
-| 3 | **Pre-index scan** | Regex/NER for PII, keys, passwords, internal URLs. Mask or block the document. | Roadmap (simple regex version if time allows) |
+| 3 | **Pre-index scan** | Regex/NER for PII, keys, passwords, internal URLs. Mask or block the document. | Yes (regex version done) |
 | 4 | **User-level data via toolkit only** | Per-user data (payments, profile) comes from toolkit calls with that user's session token, never from RAG. | Yes |
 | 5 | **Output guardrail** | Check the answer before sending: other people's PII, keys, system prompt fragments. | Yes |
 | 6 | **Prompt injection defense** | Retrieved text and user messages are data, not instructions. Toolkit has an action allowlist. | Basic version |
@@ -235,3 +235,35 @@ The knowledge base holds a lot of sensitive data, so leak prevention is part of 
 - At most 1–2 sub-agents per person (reviewer/tester).
 - Gemini: research, pitch, and fallback when Claude limits run out.
 - Our edge is coordination and preparation, not the number of agents.
+
+## 12. RAG + user context: current status (code in `RAG/`)
+
+**Knowledge base (RAG)**
+- Docs live in the GitHub repo: `RAG/docs/kb/<tenant>/*.md`, one folder per business. Pushing to `main` runs a GitHub Action that updates Supabase. No upload API.
+- Each doc starts with `visibility: public | internal | restricted` (in a `---` header). No label = `internal`. Only `public` reaches customers.
+  - Public: FAQ, prices/plans, how-to and navigation, refund/cancel policy, contacts and hours.
+  - Internal: support scripts, escalation rules, **retention discount limits**, known bugs.
+  - Never in docs: passwords, contracts, customer data.
+- Before saving, a scanner hides API keys, passwords, card numbers, IBAN and private keys; emails/phones only produce a warning.
+- Search: `retrieve(tenantId, question)` → top 3 public chunks of that tenant only (filter is in SQL, not the LLM).
+- `toPromptContext(hits)` wraps chunks in `<doc>` tags with escaping, so text inside a doc can't break out.
+
+**User personal context** (`RAG/lib/user/context.ts`)
+- `buildUserContext(session, { accounts, memory })` → `<user_context>` block for the prompt: account data (name, email, plan, last 3 payments, upcoming bookings) + last 5 memory notes.
+- `session = { tenantId, userId }` comes from login, never from chat text.
+- `remember(memory, session, text)` saves a note; secrets are masked.
+- Account data needs `getAccount(session)` from whoever builds the mock user DB. Memory is in-process for now (lost on restart); a Supabase table later.
+
+**For the chatbot (Person 1):** prompt = system rules + `buildUserContext(...)` + `toPromptContext(await retrieve(tenantId, question))`. Optionally run `scanSensitive()` on the answer before sending.
+
+**Tests:** tenant A never sees tenant B, internal docs never returned, prompt injection can't escape tags, secrets masked, user A never sees user B. 21 pass; 2 live-DB tests run only with Supabase keys.
+
+**How to run** (in `RAG/`): copy `.env.example` → `.env.local` and fill it; `npm install`; `npm test`; `npm run ingest` (or `npm run ingest:watch`). The GitHub Action `.github/workflows/rag-ingest.yml` runs tests, then ingest, on every push to `main` that changes docs or `RAG/lib/rag`.
+
+**Demo knowledge base:** `RAG/docs/kb/lumora/` — 14 docs for the Lumora demo site (`demo-site/`), 101 chunks. 10 public (getting started, lessons & schedule, plans & pricing, billing & subscription, tutors, account & privacy, technical help, subjects & resources, site navigation, contact support), 3 internal (support playbook, retention offers with discount codes, known issues incl. Apple Pay bug), 1 restricted (fake secrets, shows the scanner). Sections carry `- URL:` and `- Tools:` lines (e.g. `reschedule_lesson`, `pause_subscription`, `cancel_subscription`, `request_refund`, `change_tutor`, `reset_password`) so the chatbot knows which card/action fits. `npm run eval` scores retrieval on 24 real questions and 5 leak attempts.
+
+**Still to do**
+- Add GitHub secrets: `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Settings → Secrets → Actions).
+- In Supabase: `drop table doc_chunks cascade;` then run `RAG/supabase/rag.sql`.
+- Tune the similarity cutoff (0.45) on real questions.
+
