@@ -24,8 +24,31 @@ const MAX_WAIT = 20_000; // keep a chat reply under a minute even when throttled
 /** Thrown when Gemini keeps rate-limiting us (free tier: a few requests per minute). */
 export class ModelBusyError extends Error {}
 
-export function geminiModel(opts: { apiKey: string; model: string; temperature?: number }): Model {
+/**
+ * Tries each model in order; on quota (429), overload (5xx) or a retired model (404) it moves straight to the next.
+ * Free-tier limits are per model, so a chain of Flash / Flash-Lite models keeps a demo responsive.
+ */
+export function geminiChain(opts: { apiKey: string; models: string[]; temperature?: number }): Model {
+  const clients = opts.models.map((model) => ({ model, call: geminiModel({ ...opts, model, retries: 0 }) }));
+  return async (req) => {
+    let last: unknown;
+    for (const { model, call } of clients) {
+      try {
+        return await call(req);
+      } catch (e) {
+        last = e;
+        const msg = String(e);
+        if (!(e instanceof ModelBusyError) && !/Gemini API (404|5\d\d)/.test(msg)) throw e;
+        console.warn(`Gemini ${model} unavailable, trying next: ${msg.slice(0, 120)}`);
+      }
+    }
+    throw last instanceof ModelBusyError ? last : new ModelBusyError(String(last));
+  };
+}
+
+export function geminiModel(opts: { apiKey: string; model: string; temperature?: number; retries?: number }): Model {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${opts.model}:generateContent`;
+  const retries = opts.retries ?? RETRIES;
   return async ({ system, contents, tools }) => {
     const body = JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
@@ -40,7 +63,7 @@ export function geminiModel(opts: { apiKey: string; model: string; temperature?:
         headers: { "Content-Type": "application/json", "x-goog-api-key": opts.apiKey },
         body,
       });
-      if ((res.status === 429 || res.status >= 500) && attempt < RETRIES) {
+      if ((res.status === 429 || res.status >= 500) && attempt < retries) {
         // Gemini puts the pause in the body: "retryDelay": "17s"
         const hinted = Number((await res.clone().text()).match(/"retryDelay":\s*"(\d+(?:\.\d+)?)s"/)?.[1]);
         await new Promise((r) => setTimeout(r, Math.min(MAX_WAIT, hinted ? hinted * 1000 + 500 : 1500 * 2 ** attempt)));

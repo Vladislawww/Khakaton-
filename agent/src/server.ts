@@ -3,7 +3,7 @@ import http from "node:http";
 import { pathToFileURL } from "node:url";
 import { AgentError, createAgent, type Agent } from "./agent";
 import { retrieve } from "../../RAG/lib/rag/retrieve";
-import { geminiModel, ModelBusyError } from "./gemini";
+import { geminiChain, ModelBusyError } from "./gemini";
 import { supportApi } from "./support-api";
 
 type Options = { allowedOrigin?: string; supervisorToken?: string; info?: Record<string, unknown> };
@@ -111,13 +111,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   } catch {}
   const missing = ["GEMINI_API_KEY", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"].filter((name) => !process.env[name]);
   const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-2.5-flash-lite")
+    .split(",").map((m) => m.trim()).filter((m) => m && m !== model);
   const supportApiUrl = process.env.SUPPORT_API_URL || "https://lumora-api-lm0d.onrender.com";
   const tenantId = process.env.TENANT_ID || "lumora";
 
   const agent = missing.length
     ? unconfiguredAgent(missing)
     : createAgent({
-        model: geminiModel({ apiKey: process.env.GEMINI_API_KEY!, model }),
+        model: geminiChain({ apiKey: process.env.GEMINI_API_KEY!, models: [model, ...fallbacks] }),
         api: supportApi(supportApiUrl),
         retrieve: (tenant, q) => retrieve(tenant, q),
         tenantId,
@@ -128,6 +130,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   createHttpServer(agent, {
     allowedOrigin: process.env.ALLOWED_ORIGIN,
     supervisorToken: process.env.SUPERVISOR_TOKEN,
-    info: { configured: !missing.length, missing, model, tenant: tenantId, support_api: supportApiUrl },
+    info: { configured: !missing.length, missing, model, fallbacks, tenant: tenantId, support_api: supportApiUrl },
   }).listen(port, () => console.log(`Lumora support agent listening on :${port} (model ${model})`));
 }
