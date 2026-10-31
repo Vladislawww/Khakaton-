@@ -164,7 +164,7 @@
     } else if (act === 'reschedule') {
       const lesson = state.lessons.find((l) => l.id === b.dataset.id);
       const suggestion = new Date(new Date(lesson.starts_at).getTime() + 24 * 3600 * 1000);
-      openModal(`<h2 id="action-title">Reschedule lesson</h2><p class="muted">Currently ${fmtDate(lesson.starts_at)} at ${fmtTime(lesson.starts_at)}. Free up to 4 hours before start.</p>
+      openModal(`<h2 id="action-title">Reschedule lesson</h2><p class="muted">Currently ${fmtDate(lesson.starts_at)} at ${fmtTime(lesson.starts_at)}. Can be moved up to 24 hours before start, to a time at least 24 hours away.</p>
         <div class="field"><label for="rs-time">New date and time</label><input id="rs-time" type="datetime-local" step="900" value="${toLocalInput(suggestion)}"></div>
         <div class="btn-row mt-32"><button class="btn btn--primary" data-reschedule="${lesson.id}">Confirm new time</button></div>`);
     } else if (act === 'cancel-lesson') {

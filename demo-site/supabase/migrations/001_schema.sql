@@ -173,9 +173,9 @@ create or replace function public.reschedule_lesson(lesson_id uuid, new_start ti
 returns public.lessons language plpgsql security definer set search_path = public as $$
 declare l public.lessons;
 begin
-  if new_start < now() + interval '4 hours' then raise exception 'New time must be at least 4 hours from now'; end if;
+  if new_start < now() + interval '24 hours' then raise exception 'New time must be at least 24 hours from now'; end if;
   update lessons set starts_at = new_start
-   where id = lesson_id and status = 'scheduled' and starts_at > now() + interval '4 hours'
+   where id = lesson_id and status = 'scheduled' and starts_at > now() + interval '24 hours'
      and child_id in (select id from children where parent_id = auth.uid())
   returning * into l;
   if l.id is null then raise exception 'Lesson not found or too close to start time'; end if;
