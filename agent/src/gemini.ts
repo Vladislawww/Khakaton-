@@ -18,7 +18,11 @@ export type ModelRequest = { system: string; contents: Content[]; tools: Functio
 /** One model turn. Return the model's content exactly as received, so thought signatures round-trip. */
 export type Model = (req: ModelRequest) => Promise<Content>;
 
-const RETRIES = 3;
+const RETRIES = 2;
+const MAX_WAIT = 20_000; // keep a chat reply under a minute even when throttled
+
+/** Thrown when Gemini keeps rate-limiting us (free tier: a few requests per minute). */
+export class ModelBusyError extends Error {}
 
 export function geminiModel(opts: { apiKey: string; model: string; temperature?: number }): Model {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${opts.model}:generateContent`;
@@ -37,9 +41,12 @@ export function geminiModel(opts: { apiKey: string; model: string; temperature?:
         body,
       });
       if ((res.status === 429 || res.status >= 500) && attempt < RETRIES) {
-        await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+        // Gemini puts the pause in the body: "retryDelay": "17s"
+        const hinted = Number((await res.clone().text()).match(/"retryDelay":\s*"(\d+(?:\.\d+)?)s"/)?.[1]);
+        await new Promise((r) => setTimeout(r, Math.min(MAX_WAIT, hinted ? hinted * 1000 + 500 : 1500 * 2 ** attempt)));
         continue;
       }
+      if (res.status === 429) throw new ModelBusyError(`Gemini rate limit: ${(await res.text()).slice(0, 300)}`);
       if (!res.ok) throw new Error(`Gemini API ${res.status}: ${(await res.text()).slice(0, 500)}`);
       const json = (await res.json()) as { candidates?: { content?: Content; finishReason?: string }[] };
       const content = json.candidates?.[0]?.content;

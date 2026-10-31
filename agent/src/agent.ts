@@ -454,11 +454,19 @@ export function createAgent(deps: Deps) {
     }
 
     return withLock(conv, async () => {
-      conv.transcript.push({ role: "user", text: message, at: now().toISOString() });
-      stripOldContext(conv);
-      const ctx = await turnContext(conv, message);
-      await step(conv, [{ text: ctx.text }, { text: `Parent's message: ${message}` }], undefined, ctx.hits);
-      return view(conv);
+      const before = { contents: conv.contents.length, transcript: conv.transcript.length };
+      try {
+        conv.transcript.push({ role: "user", text: message, at: now().toISOString() });
+        stripOldContext(conv);
+        const ctx = await turnContext(conv, message);
+        await step(conv, [{ text: ctx.text }, { text: `Parent's message: ${message}` }], undefined, ctx.hits);
+        return view(conv);
+      } catch (e) {
+        // Roll back a half-finished turn (e.g. the model was rate-limited) so the parent can simply resend.
+        conv.contents.length = before.contents;
+        conv.transcript.length = before.transcript;
+        throw e;
+      }
     });
   }
 

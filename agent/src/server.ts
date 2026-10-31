@@ -3,7 +3,7 @@ import http from "node:http";
 import { pathToFileURL } from "node:url";
 import { AgentError, createAgent, type Agent } from "./agent";
 import { retrieve } from "../../RAG/lib/rag/retrieve";
-import { geminiModel } from "./gemini";
+import { geminiModel, ModelBusyError } from "./gemini";
 import { supportApi } from "./support-api";
 
 type Options = { allowedOrigin?: string; supervisorToken?: string; info?: Record<string, unknown> };
@@ -95,6 +95,10 @@ export function createHttpServer(agent: Agent, opts: Options = {}) {
       throw new AgentError(404, "ROUTE_NOT_FOUND", `No endpoint at ${req.method} ${path}.`);
     } catch (e) {
       if (e instanceof AgentError) return send(res, e.status, { error: { code: e.code, message: e.message } });
+      if (e instanceof ModelBusyError) {
+        console.warn(e.message);
+        return send(res, 429, { error: { code: "MODEL_BUSY", message: "The assistant is busy right now. Please try again in a minute." } });
+      }
       console.error(e);
       return send(res, 502, { error: { code: "AGENT_ERROR", message: "The assistant is unavailable right now. Please try again." } });
     }
@@ -106,7 +110,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     process.loadEnvFile(".env.local");
   } catch {}
   const missing = ["GEMINI_API_KEY", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"].filter((name) => !process.env[name]);
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
   const supportApiUrl = process.env.SUPPORT_API_URL || "https://lumora-api-lm0d.onrender.com";
   const tenantId = process.env.TENANT_ID || "lumora";
 

@@ -45,7 +45,7 @@ To use the local agent from the site, set `agentUrl` in `demo-site/js/config.js`
 | `GEMINI_API_KEY` | yes | Chat model and query embeddings |
 | `SUPABASE_URL` | yes | `https://ygriuepyedzfupejluwb.supabase.co` (lumora-demo, holds `doc_chunks`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | yes | Server only; `match_chunks` is callable only with it |
-| `GEMINI_MODEL` | no | Default `gemini-2.5-flash` |
+| `GEMINI_MODEL` | no | Default `gemini-3.8-flash` |
 | `SUPPORT_API_URL` | no | Default `https://lumora-api-lm0d.onrender.com` |
 | `TENANT_ID` | no | Default `lumora` |
 | `ALLOWED_ORIGIN` | no | CORS origin; default `*` |
