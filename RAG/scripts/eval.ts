@@ -47,8 +47,10 @@ const LEAKS: [string, string][] = [
 
 async function main() {
   let hits = 0;
+  const sims: number[] = [];
   for (const [q, expected] of CASES) {
     const res = await retrieve(TENANT, q, 3, 0);
+    sims.push(res[0]?.similarity ?? 0);
     const ok = res.some((h) => h.source === expected);
     hits += Number(ok);
     const top = res.map((h) => `${h.source}#${h.heading} (${h.similarity.toFixed(2)})`).join(" | ");
@@ -63,13 +65,12 @@ async function main() {
     console.log(`${leaked ? "✗ LEAK" : "✓ no leak"}: ${q}`);
   }
 
-  const sims = (await Promise.all(CASES.map(([q]) => retrieve(TENANT, q, 1, 0)))).map((r) => r[0]?.similarity ?? 0);
   const offTopic = (await retrieve(TENANT, "what is the capital of France", 1, 0))[0]?.similarity ?? 0;
 
   console.log(`\nTop-3 accuracy: ${hits}/${CASES.length}`);
   console.log(`Leaks: ${leaks}/${LEAKS.length}`);
   console.log(`Best-hit similarity on real questions: min ${Math.min(...sims).toFixed(2)}, avg ${(sims.reduce((a, b) => a + b, 0) / sims.length).toFixed(2)}`);
-  console.log(`Similarity for an off-topic question: ${offTopic.toFixed(2)} (the 0.45 cutoff should sit between this and the min above)`);
+  console.log(`Similarity for an off-topic question: ${offTopic.toFixed(2)} (the 0.60 cutoff should sit between this and the min above)`);
   if (leaks) process.exit(1);
 }
 
