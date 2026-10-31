@@ -32,11 +32,14 @@ After the free trial lesson, the tutor shares a recommended plan and pace (for e
 - **Reading and writing:** kindergarten through grade 10. Phonics, fluency, comprehension, vocabulary, spelling, creative writing and essay writing.
 - Families can take one subject or bundle math and reading together, which lowers the price per lesson.
 
+## Do you teach other subjects, like science, languages or music?
+No. Lumora teaches only two subjects: math, and reading and writing. There are no lessons in science (chemistry, physics, biology), foreign languages, music or piano, art, coding, or test prep outside math and reading.
+
 ## Is the curriculum aligned with school standards?
 Yes. Every plan follows Common Core and individual state standards, so school and tutoring point the same way. Tutors can also work directly on school homework: upload the worksheet in the dashboard and the tutor folds it into the lesson.
 
 ## How long is a lesson?
-A standard lesson is 50 minutes. Kindergarten and grade 1 lessons are 30 minutes, because that fits a young child's attention span. Older children can also choose 30-minute lessons if that suits them better.
+A standard lesson is 50 minutes. Kindergarten and grade 1 lessons are 30 minutes, because that fits a young child's attention span. Younger children in other grades can also choose 30-minute lessons instead of 50.
 
 ## What does my child need for a lesson?
 - A laptop or tablet with a camera (Windows or Mac laptops, Chromebooks, or iPads from the last five years).
