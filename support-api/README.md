@@ -2,7 +2,7 @@
 
 REST endpoints the support agent calls as tools. All data is fake and lives in memory: it's rebuilt from `seed.js` on every start (and on `POST /api/admin/reset`), with lesson times relative to "now".
 
-- **Live:** https://lumora-api.onrender.com (free Render instance: the first request after ~15 idle minutes takes up to a minute to wake it, and waking also resets the data)
+- **Live:** https://lumora-api-lm0d.onrender.com (free Render instance: the first request after ~15 idle minutes takes up to a minute to wake it, and waking also resets the data)
 - **Local:** `node server.js` (port 3000, or `PORT=...`). Tests: `node --test test.mjs`. Node 20+, no dependencies.
 
 > This is a separate store from the website's Supabase database. The families have the same names so the story matches, but changes made here don't show on the website dashboard.
@@ -94,9 +94,9 @@ Tutors: `tut_01` Nia Okoro (math), `tut_02` Leo Brandt (math, **no free slots**)
 | same with `approved_by` | `cancelled` + refund |
 
 ```bash
-curl -s https://lumora-api.onrender.com/api/accounts/acc_1001
-curl -s -X POST https://lumora-api.onrender.com/api/lessons/les_3201/reschedule \
+curl -s https://lumora-api-lm0d.onrender.com/api/accounts/acc_1001
+curl -s -X POST https://lumora-api-lm0d.onrender.com/api/lessons/les_3201/reschedule \
   -H "Content-Type: application/json" -H "X-Caller: agent:navi" \
   -d '{"new_start":"2026-11-10T16:00:00Z","reason":"Doctor visit"}'
-curl -s https://lumora-api.onrender.com/api/audit_log?limit=5
+curl -s https://lumora-api-lm0d.onrender.com/api/audit_log?limit=5
 ```

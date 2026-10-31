@@ -51,6 +51,10 @@ npx serve demo-site
   Each one checks ownership and writes to `action_log`.
 - Booking requests from the "Book a free lesson" form land in `leads`.
 
+## Support-agent tool API
+
+The five mock support tools (get_account, get_lessons, reschedule_lesson, assign_tutor, cancel_subscription) run as a separate REST service with its own in-memory data: see [`../support-api/README.md`](../support-api/README.md). Live at https://lumora-api-lm0d.onrender.com.
+
 ## Demo stubs
 
 The video, tutor applications, article pages and worksheet downloads show a toast instead of opening anything.
