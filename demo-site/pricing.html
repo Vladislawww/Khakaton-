@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pricing | Lumora Learning</title>
+  <meta name="description" content="Lumora plans for 1:1 math and reading lessons, from $19 per lesson. Fictional demo site.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="pricing">
+  <div data-site-header></div>
+
+  <main>
+    <section class="hero" data-section="plans">
+      <div class="container">
+        <span class="eyebrow">Simple pricing</span>
+        <h1>Plans that fit your family</h1>
+        <p class="lead">Every plan includes a free first lesson, progress reports and the option to switch tutors.</p>
+        <div class="billing-toggle" data-billing role="group" aria-label="Subject">
+          <button class="is-active" data-mode="one" aria-pressed="true">One subject</button>
+          <button data-mode="both" aria-pressed="false">Math + reading</button>
+        </div>
+        <div class="plans">
+          <article class="card plan">
+            <h3>3 months <span class="save">save 10%</span></h3>
+            <p class="muted">Best for a quick boost</p>
+            <div class="price"><strong data-price-math="26" data-price-both="24">$26</strong><s>$29</s></div>
+            <p class="muted">per lesson, billed monthly</p>
+            <ul><li>Skills check and plan</li><li>2 progress reports</li><li>Homework help</li></ul>
+            <button class="btn btn--ghost" data-book>Try for free</button>
+          </article>
+          <article class="card plan plan--featured">
+            <span class="plan-flag">Most popular</span>
+            <h3>6 months <span class="save">save 20%</span></h3>
+            <p class="muted">Steady, visible progress</p>
+            <div class="price"><strong data-price-math="23" data-price-both="21">$23</strong><s>$29</s></div>
+            <p class="muted">per lesson, billed monthly</p>
+            <ul><li>Everything in 3 months</li><li>4 progress reports</li><li>Practice buddy access</li></ul>
+            <button class="btn btn--primary" data-book>Try for free</button>
+          </article>
+          <article class="card plan">
+            <h3>12 months <span class="save">save 35%</span></h3>
+            <p class="muted">Lowest price per lesson</p>
+            <div class="price"><strong data-price-math="19" data-price-both="17">$19</strong><s>$29</s></div>
+            <p class="muted">per lesson, billed monthly</p>
+            <ul><li>Everything in 6 months</li><li>Monthly parent call</li><li>Summer pause included</li></ul>
+            <button class="btn btn--ghost" data-book>Try for free</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-section="cta">
+      <div class="container">
+        <div class="banner banner--coral reveal">
+          <div><h3>Not sure which plan? Start with a free lesson.</h3><p>Your tutor will recommend a pace after the first session.</p><button class="btn btn--light" data-book>Book a free lesson</button></div>
+          <div class="art art--square" data-art="wallet"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--white" data-section="highlights">
+      <div class="container">
+        <div class="section-head reveal"><h2>What every plan includes</h2></div>
+        <div class="grid grid-3">
+          <div class="card reveal"><div class="icon-badge">☎</div><h3>Friendly support</h3><p class="muted">Chat with our support team seven days a week.</p></div>
+          <div class="card reveal"><div class="icon-badge icon-badge--coral">$</div><h3>Fair pricing</h3><p class="muted">No sign-up fee. Unused lessons stay on your account.</p></div>
+          <div class="card reveal"><div class="icon-badge icon-badge--sun">↻</div><h3>Flexibility</h3><p class="muted">Pause, switch subjects or change tutors whenever you need.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--sand" data-section="faq">
+      <div class="container">
+        <div class="section-head reveal"><h2>Pricing questions</h2></div>
+        <div class="faq">
+          <details><summary>How much does a lesson cost?</summary><div class="answer"><p>Between $19 and $26 per lesson for one subject, depending on plan length. Bundling math and reading lowers that by $2 per lesson.</p></div></details>
+          <details><summary>How long is a lesson?</summary><div class="answer"><p>50 minutes, or 30 minutes for kindergarten and grade 1.</p></div></details>
+          <details><summary>Can I cancel my subscription?</summary><div class="answer"><p>Yes, from the dashboard at any time. Unused paid lessons stay on your account for 12 months.</p></div></details>
+          <details><summary>Do you offer refunds?</summary><div class="answer"><p>Unused lessons can be refunded within 30 days of purchase.</p></div></details>
+          <details><summary>Are there sibling discounts?</summary><div class="answer"><p>Yes, a second child gets 15% off any plan.</p></div></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-section="booking">
+      <div class="container">
+        <div class="banner reveal" style="grid-template-columns:1fr">
+          <div>
+            <h2>Want your child to enjoy learning?</h2>
+            <p>Leave your details and we’ll set up a free lesson. Demo form: nothing is sent.</p>
+            <form class="form-inline" onsubmit="event.preventDefault(); this.querySelector('button').click();">
+              <div class="field"><label for="pf-grade" style="color:#fff">Grade</label><select id="pf-grade"><option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option><option>Grade 5</option><option>Grade 6+</option></select></div>
+              <div class="field"><label for="pf-email" style="color:#fff">Parent’s email</label><input id="pf-email" type="email" placeholder="you@example.com" autocomplete="off"></div>
+              <button type="button" class="btn btn--primary" data-book>Sign up</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-site-footer></div>
+  <script src="js/site.js"></script>
+</body>
+</html>
